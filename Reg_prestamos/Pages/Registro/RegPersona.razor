@@ -1,5 +1,5 @@
-﻿@page "/Registro"
-@page "/Registro/{RegistroId:int}"
+﻿@page "/Persona"
+@page "/Persona/{PersonaID:int}"
 
 @using Reg_prestamos.Model;
 @using Reg_prestamos.BLL;
@@ -8,7 +8,7 @@
 
 @inject IToastService toast
 
-<EditForm Model="registro" OnValidSubmit="Guardar">
+<EditForm Model="personas" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
     <div class="card">
         <div class="card-header">
@@ -21,7 +21,7 @@
                     <div class="form-group">
                         <label>RegistroID</label>
                         <div class="input-group">
-                            <InputNumber @bind-Value="registro.RegistroId" class="form-control col-4" />
+                            <InputNumber @bind-Value="personas.PersonaID" class="form-control col-4" />
                             <div class="input-group-append">
                                 <button type="button" class="btn btn-primary input-group-text" @onclick="Buscar">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-search" viewBox="0 0 20 20">
@@ -36,35 +36,35 @@
             @*Nombres*@
             <div class="form-group">
                 <label>Nombres</label>
-                <InputText @bind-Value="registro.Nombres" class="form-control" />
-                <ValidationMessage For="@(() => registro.Nombres)" />
+                <InputText @bind-Value="personas.Nombre" class="form-control" />
+                <ValidationMessage For="@(() => personas.Nombre)" />
             </div>
             @*Edad*@
             <div class="form-group">
                 <label>Edad</label>
-                <InputText @bind-Value="registro.Edad" class="form-control" />
-                <ValidationMessage For="@(() => registro.Edad)" />
+                <InputText @bind-Value="personas.Telefono" class="form-control" />
+                <ValidationMessage For="@(() => personas.Telefono)" />
             </div>
 
             @*Cedula*@
             <div class="form-group">
                 <label>Cedula</label>
-                <InputText @bind-Value="registro.Cedula" class="form-control" />
-                <ValidationMessage For="@(() => registro.Cedula)" />
+                <InputText @bind-Value="personas.Cedula" class="form-control" />
+                <ValidationMessage For="@(() => personas.Cedula)" />
             </div>
 
             @*Telefono*@
             <div class="form-group">
                 <label>Telefono</label>
-                <InputText @bind-Value="registro.Telefono" class="form-control" />
-                <ValidationMessage For="@(() => registro.Telefono)" />
+                <InputText @bind-Value="personas.Direccion" class="form-control" />
+                <ValidationMessage For="@(() => personas.Direccion)" />
             </div>
 
             @*Fecha de Nacimiento*@
             <div class="form-group">
                 <label>Fecha de Nacimiento</label>
-                <InputDate @bind-Value="registro.FechaNacimiento" class="form-control" />
-                <ValidationMessage For="@(() => registro.FechaNacimiento)" />
+                <InputDate @bind-Value="personas.Fecha" class="form-control" />
+                <ValidationMessage For="@(() => personas.Fecha)" />
             </div>
         </div>
         @*Botones*@
@@ -102,8 +102,8 @@
 @code
 {
     [Parameter]
-    public int PersonaId { get; set; }
-    public RegPersona registro = new RegPersona();
+    public int PersonaID { get; set; }
+    public Persona personas = new Persona();
 
     protected override void OnInitialized()
     {
@@ -113,19 +113,19 @@
 
     public void Nuevo()
     {
-        registro = new RegPersona();
+        personas = new Persona();
 
     }
 
 
     private void Buscar()
     {
-        if (registro.PersonaId > 0)
+        if (personas.PersonaID > 0)
         {
-            var encontrado = PersonasBLL.Buscar(registro.PersonaId);
+            var encontrado = PersonasBLL.Buscar(personas.PersonaID);
 
             if (encontrado != null)
-                this.registro = encontrado;
+                this.personas = encontrado;
             else
                 toast.ShowWarning("no encontrado");
         }
@@ -135,8 +135,7 @@
     {
         bool guardo;
 
-        guardo = PersonasBLL.Guardar(registro);
-
+        guardo = PersonasBLL.Guardar(personas);
         if (guardo)
         {
             Nuevo();
@@ -150,7 +149,7 @@
     {
         bool elimino;
 
-        elimino = PersonasBLL.Eliminar(registro.PersonaId);
+        elimino = PersonasBLL.Eliminar(personas.PersonaID);
 
         if (elimino)
         {

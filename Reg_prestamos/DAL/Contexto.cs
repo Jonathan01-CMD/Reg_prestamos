@@ -9,9 +9,11 @@ namespace Reg_prestamos.DAL
 {
     public class Contexto : DbContext
     {
-        public DbSet<RegPersona> Personas { get; set; }
+        public DbSet<Persona> Personas { get; set; }
 
-        public DbSet<RegPrestamos> Prestamos { get; set; }
+        public DbSet<Prestamos> Prestamos { get; set; }
+
+        public DbSet<Moras> Moras { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

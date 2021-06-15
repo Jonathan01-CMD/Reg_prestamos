@@ -4,20 +4,21 @@ using Reg_prestamos.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Reg_prestamos.BLL
 {
     public class PersonasBLL
     {
-        public static bool Modificar(RegPersona registro)
+        public static bool Modificar(Persona personas)
         {
             bool paso = false;
             Contexto db = new Contexto();
 
             try
             {
-                db.Entry(registro).State = EntityState.Modified;
+                db.Entry(personas).State = EntityState.Modified;
                 paso = db.SaveChanges() > 0;
             }
             catch (Exception)
@@ -32,15 +33,14 @@ namespace Reg_prestamos.BLL
             return paso;
         }
 
-        public static bool insertar(RegPersona registro)
+        public static bool insertar(Persona personas)
         {
             bool paso = false;
             Contexto db = new Contexto();
-
+             
             try
             {
-               
-                db.RegPersona.Add(registro);
+                db.Personas.Add(personas);
                 paso = db.SaveChanges() > 0;
             }
             catch
@@ -62,7 +62,7 @@ namespace Reg_prestamos.BLL
             bool encontrado = false;
             try
             {
-                encontrado = db.RegPersona.Any(p => p.RegistroId == id);
+                encontrado = db.Personas.Any(p => p.PersonaID == id);
             }
             catch
             {
@@ -77,12 +77,12 @@ namespace Reg_prestamos.BLL
         }
 
 
-        public static bool Guardar(RegPersona registro)
+        public static bool Guardar(Persona personas)
         {
-            if (!Existe(registro.RegistroId))
-                return insertar(registro);
+            if (!Existe(personas.PersonaID))
+                return insertar(personas);
             else
-                return Modificar(registro);
+                return Modificar(personas);
         }
         public static bool Eliminar(int id)
         {
@@ -91,10 +91,10 @@ namespace Reg_prestamos.BLL
 
             try
             {
-                var registro = db.RegPersona.Find(id);
+                var registro = db.Personas.Find(id);
                 if (registro != null)
                 {
-                    db.RegPersona.Remove(registro);
+                    db.Personas.Remove(registro);
                     paso = db.SaveChanges() > 0;
                 }
             }
@@ -109,14 +109,14 @@ namespace Reg_prestamos.BLL
             return paso;
         }
 
-        public static RegPersona Buscar(int id)
+        public static Persona Buscar(int id)
         {
             Contexto db = new Contexto();
-            RegPersona registro;
+            Persona personas;
 
             try
             {
-                registro = db.Registros.Find(id);
+                personas = db.Personas.Find(id);
             }
             catch (Exception)
             {
@@ -127,15 +127,15 @@ namespace Reg_prestamos.BLL
                 db.Dispose();
             }
 
-            return registro;
+            return personas;
         }
-        public static List<RegPersona> GetPersonas()
+        public static List<Persona> GetPersonas()
         {
-            List<RegPersona> lista = new List<RegPersona>();
+            List<Persona> lista = new List<Persona>();
             Contexto db = new Contexto();
             try
             {
-                lista = db.RegPersona.ToList();
+                lista = db.Personas.ToList();
             }
             catch (Exception)
             {
@@ -148,13 +148,13 @@ namespace Reg_prestamos.BLL
             return lista;
         }
 
-        public static List<RegPersona> GetList(Expression<Func<RegPersona, bool>> criterio)
+        public static List<Persona> GetList(Expression<Func<Persona, bool>> criterio)
         {
-            List<RegPersona> lista = new List<RegPersona>();
+            List<Persona> lista = new List<Persona>();
             Contexto db = new Contexto();
             try
             {
-                lista = db.RegPersona.Where(criterio).ToList();
+                lista = db.Personas.Where(criterio).ToList();
             }
             catch (Exception)
             {

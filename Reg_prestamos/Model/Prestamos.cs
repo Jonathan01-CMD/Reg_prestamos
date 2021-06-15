@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace Reg_prestamos.Model
 {
-    public class RegPersona
+    public class Prestamos
     {
         [Key]
-        [Required(ErrorMessage = "Campo PrestamoID no debe estar vacio")]
+        [Required(ErrorMessage = "No debe de estar Vacío este campo")]
         public int PrestamoID { get; set; }
 
-        [Required(ErrorMessage ="No puede dejar el campo fecha vacio")]
+        [Required(ErrorMessage = "No puede dejar el campo fecha vacio")]
         [DisplayFormat(DataFormatString = "{0:dd,mm,yyyy}")]
-        public DataType Fecha { get; set; }
+        public DateTime Fecha { get; set; }
 
         [Required(ErrorMessage = "No puede dejar el campo PersonasID vacio")]
-        public int PersonasID {get; set;}
+        public int PersonasID { get; set; }
 
-        [Required(ErrorMessage = "No puede dejar el campo Concepto vacio")]
+        [Required(ErrorMessage = "No debe de estar Vacío este campo")]
         public string Concepto { get; set; }
 
         [Required(ErrorMessage = "No puede dejar el campo Monton vacio")]
