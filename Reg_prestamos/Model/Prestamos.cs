@@ -23,8 +23,17 @@ namespace Reg_prestamos.Model
         public string Concepto { get; set; }
 
         [Required(ErrorMessage = "No puede dejar el campo Monton vacio")]
-        public float Monto { get; set; }
+        public decimal Monto { get; set; }
 
-        public float Balance { get; set; }
+        public decimal Balance { get; set; }
+
+        public Prestamos()
+        {
+            PrestamoID = 0;
+            PersonasID = 0;
+            Concepto = "";
+            Monto = 0;
+            Balance = 0;
+        }
     }
 }

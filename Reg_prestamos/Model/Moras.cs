@@ -12,16 +12,17 @@ namespace Reg_prestamos.Model
         [Key]
         public int MorasId { get; set; }
         public DateTime Fecha { get; set; }
-        public double Total { get; set; }
+        public decimal Total { get; set; }
 
         [ForeignKey("MorasId")]
-        public List<MorasDetalle> Detalle { get; set; }
+        public List<MorasDetalle> Detalle { get; set; } = new List<MorasDetalle>();
 
         public Moras()
         {
             MorasId = 0;
             Fecha = DateTime.Now;
             Total = 0;
+            Detalle = new List<MorasDetalle>();
         }
 
     }

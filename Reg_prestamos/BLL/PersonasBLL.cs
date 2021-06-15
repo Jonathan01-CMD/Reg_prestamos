@@ -129,6 +129,55 @@ namespace Reg_prestamos.BLL
 
             return personas;
         }
+        public static bool AumentarBalance(int personaId, decimal balancePrestamo)
+        {
+            bool paso = false;
+            Contexto contexto = new Contexto();
+            try
+            {
+                var persona = contexto.Personas.Find(personaId);
+                if (persona != null)
+                {
+                    persona.Balance += balancePrestamo;
+                    paso = contexto.SaveChanges() > 0;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                contexto.Dispose();
+            }
+            return paso;
+        }
+
+        public static bool DisminuirBalance(int personaId, decimal balancePrestamo)
+        {
+            bool paso = false;
+            Contexto contexto = new Contexto();
+            try
+            {
+                var persona = contexto.Personas.Find(personaId);
+                if (persona != null)
+                {
+                    persona.Balance -= balancePrestamo;
+                    paso = contexto.SaveChanges() > 0;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                contexto.Dispose();
+            }
+            return paso;
+        }
+
+
         public static List<Persona> GetPersonas()
         {
             List<Persona> lista = new List<Persona>();

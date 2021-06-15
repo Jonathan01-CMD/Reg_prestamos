@@ -11,35 +11,13 @@ namespace Reg_prestamos.BLL
 {
     public class PrestamosBLL
     {
-        public static bool Guardar(Prestamos prestamos)
+        public static bool Guardar(Prestamos prestamos, decimal montoAnterior)
         {
             if (!Existe(prestamos.PersonasID))
                 return Insertar(prestamos);
             else
-                return Modificar(prestamos);
+                return Modificar(prestamos, montoAnterior);
         }
-
-        public static bool Existe(int id)
-        {
-            Contexto contexto = new Contexto();
-            bool encontrado = false;
-
-            try
-            {
-                encontrado = contexto.Prestamos.Any(e => e.PrestamoID == id);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                contexto.Dispose();
-            }
-
-            return encontrado;
-        }
-
         private static bool Insertar(Prestamos prestamos)
         {
             bool paso = false;
@@ -47,9 +25,9 @@ namespace Reg_prestamos.BLL
 
             try
             {
+                PersonasBLL.AumentarBalance(prestamos.PersonasID, prestamos.Monto);
                 contexto.Prestamos.Add(prestamos);
                 paso = contexto.SaveChanges() > 0;
-                AfectarBalance(prestamos);
             }
             catch (Exception)
             {
@@ -62,17 +40,17 @@ namespace Reg_prestamos.BLL
 
             return paso;
         }
-
-        private static bool Modificar(Prestamos prestamos)
+        private static bool Modificar(Prestamos prestamos, decimal montoAnterior)
         {
             Contexto contexto = new Contexto();
             bool paso = false;
 
             try
             {
+                PersonasBLL.DisminuirBalance(prestamos.PersonasID, montoAnterior);
+                PersonasBLL.AumentarBalance(prestamos.PersonasID, prestamos.Monto);
                 contexto.Entry(prestamos).State = EntityState.Modified;
                 paso = contexto.SaveChanges() > 0;
-                AfectarBalance(prestamos);
             }
             catch (Exception)
             {
@@ -85,7 +63,6 @@ namespace Reg_prestamos.BLL
 
             return paso;
         }
-
         public static bool Eliminar(int id)
         {
             bool paso = false;
@@ -93,11 +70,11 @@ namespace Reg_prestamos.BLL
 
             try
             {
-                var prestamos = contexto.Prestamos.Find(id);
-
-                if (prestamos != null)
+                var prestamo = contexto.Prestamos.Find(id);
+                if (prestamo != null)
                 {
-                    contexto.Prestamos.Remove(prestamos);//remueve la entidad
+                    PersonasBLL.DisminuirBalance(prestamo.PersonasID, prestamo.Monto);
+                    contexto.Prestamos.Remove(prestamo);
                     paso = contexto.SaveChanges() > 0;
                 }
             }
@@ -131,17 +108,16 @@ namespace Reg_prestamos.BLL
 
             return prestamos;
         }
-        private static bool AfectarBalance(Prestamos prestamo)
+
+        public static bool Existe(int id)
         {
-            bool paso = false;
-            Contexto db = new Contexto();
+            Contexto contexto = new Contexto();
+            bool encontrado = false;
 
             try
             {
-                prestamo.Balance = prestamo.Monto;
-
-                db.Personas.Find(prestamo.PersonasID).Balance = prestamo.Balance;
-                paso = db.SaveChanges() > 0;
+                encontrado = contexto.Prestamos
+                    .Any(e => e.PrestamoID == id);
             }
             catch (Exception)
             {
@@ -149,11 +125,12 @@ namespace Reg_prestamos.BLL
             }
             finally
             {
-                db.Dispose();
+                contexto.Dispose();
             }
 
-            return paso;
+            return encontrado;
         }
+        
         public static List<Prestamos> GetPersonas()
         {
             List<Prestamos> lista = new List<Prestamos>();
@@ -180,7 +157,7 @@ namespace Reg_prestamos.BLL
             try
             {
                 //obtener la lista y filtrarla según el criterio recibido por parametro.
-                lista = contexto.Prestamos.Where(criterio).ToList();
+                lista = contexto.Prestamos.ToList();
             }
             catch (Exception)
             {

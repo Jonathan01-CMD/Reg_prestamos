@@ -28,6 +28,6 @@ namespace Reg_prestamos.Model
         [DisplayFormat(DataFormatString = "{0:dd,mm,yyyy}")]
         public DateTime Fecha { get; set; }
 
-        public float Balance { get; set; }
+        public decimal Balance { get; set; }
     }
 }

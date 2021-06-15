@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Reg_prestamos.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +29,6 @@ namespace Reg_prestamos
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
             services.AddBlazoredToast();
         }
 

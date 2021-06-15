@@ -111,72 +111,70 @@
 
 @code
 { [Parameter]
-            public int PrestamoID { get; set; }
+    public int PrestamoID { get; set; }
+    private Prestamos prestamos = new Prestamos();
+    List<Persona> ListaPersonas = new List<Persona>();
+    public decimal MontoAnterior { get; set; }
 
-            private Prestamos prestamos = new Prestamos();
-            List<Persona> ListaPersonas = new List<Persona>();
+    protected override void OnInitialized()
+    {
+        Nuevo();
+        if (PrestamoID > 0)
+        {
+            var Prestamo = PrestamosBLL.Buscar(PrestamoID);
+            if (Prestamo != null)
+                this.prestamos = Prestamo;
+            else
+                toast.ShowWarning("No encontrado.");
+        }
 
-            protected override void OnInitialized()
-            {
-                Nuevo();
-                if (PrestamoID > 0)
-                {
-                    var Prestamo = PrestamosBLL.Buscar(PrestamoID);
-                    if (Prestamo != null)
-                        this.prestamos = Prestamo;
-                    else
-                        toast.ShowWarning("No encontrado.");
-                }
-
-                ListaPersonas = PersonasBLL.GetList(p => true);
-            }
-
-
-            public void Nuevo()
-            {
-                prestamos = new Prestamos();
-            }
+        ListaPersonas = PersonasBLL.GetList(p => true);
+    }
 
 
-            private void Buscar()
-            {
-                if (prestamos.PrestamoID > 0)
-                {
-                    var encontrado = PrestamosBLL.Buscar(prestamos.PrestamoID);
+    public void Nuevo()
+    {
+        prestamos = new Prestamos();
+    }
 
-                    if (encontrado != null)
-                        this.prestamos = encontrado;
-                    else
-                        toast.ShowWarning("No encontrado");
-                }
-            }
 
-            public void Guardar()
-            {
-                bool guardo;
+    private void Buscar()
+    {
+        if (prestamos.PrestamoID > 0)
+        {
+            var encontrado = PrestamosBLL.Buscar(prestamos.PrestamoID);
 
-                guardo = PrestamosBLL.Guardar(prestamos);
+            if (encontrado != null)
+                this.prestamos = encontrado;
+            else
+                toast.ShowWarning("No encontrado");
+        }
+    }
 
-                if (guardo)
-                {
-                    Nuevo();
-                    toast.ShowSuccess("Guardado correctamente");
-                }
-                else
-                    toast.ShowError("No fue posible guardar");
-            }
+    public void Guardar()
+    {
+        bool guardo;
+        guardo = PrestamosBLL.Guardar(prestamos, MontoAnterior);
+        if (guardo)
+        {
+            Nuevo();
+            toast.ShowSuccess("Guardado correctamente");
+        }
+        else
+            toast.ShowError("No fue posible guardar");
+    }
 
-            public void Eliminar()
-            {
-                bool elimino;
+    public void Eliminar()
+    {
+        bool elimino;
 
-                elimino = PrestamosBLL.Eliminar(prestamos.PrestamoID);
+        elimino = PrestamosBLL.Eliminar(prestamos.PrestamoID);
 
-                if (elimino)
-                {
-                    Nuevo();
-                    toast.ShowSuccess("Eliminado correctamente");
-                }
-                else
-                    toast.ShowError("No fue posible eliminar");
-            } }
+        if (elimino)
+        {
+            Nuevo();
+            toast.ShowSuccess("Eliminado correctamente");
+        }
+        else
+            toast.ShowError("No fue posible eliminar");
+    } }
