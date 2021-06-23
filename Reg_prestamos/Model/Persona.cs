@@ -26,8 +26,8 @@ namespace Reg_prestamos.Model
 
         [Required(ErrorMessage = "El campo Fecha Nacimiento no puede estar vacio")]
         [DisplayFormat(DataFormatString = "{0:dd,mm,yyyy}")]
-        public DateTime Fecha { get; set; }
+        public DateTime Fecha { get; set; } = DateTime.Now;
 
-        public decimal Balance { get; set; }
+        public decimal Balance { get; set; } = 0;
     }
 }

@@ -1,11 +1,6 @@
 ﻿@page "/Persona"
 @page "/Persona/{PersonaID:int}"
 
-@using Reg_prestamos.Model;
-@using Reg_prestamos.BLL;
-@using Blazored.Toast;
-@using Blazored.Toast.Services;
-
 @inject IToastService toast
 
 <EditForm Model="personas" OnValidSubmit="Guardar">

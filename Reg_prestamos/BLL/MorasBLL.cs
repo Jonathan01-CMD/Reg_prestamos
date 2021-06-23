@@ -5,12 +5,78 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
+
 
 namespace Reg_prestamos.BLL
 {
-    public class MorasBLL
+    class MorasBLL
     {
+        public static bool Existe(int id)
+        {
+            Contexto contexto = new Contexto();
+            bool encontrado = false;
+
+            try
+            {
+                encontrado = contexto.Moras.Any(e => e.MorasId == id);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                contexto.Dispose();
+            }
+
+            return encontrado;
+        }
+        private static bool Insertar(Moras mora)
+        {
+            bool paso = false;
+            Contexto contexto = new Contexto();
+            try
+            {
+                contexto.Moras.Add(mora);
+                paso = contexto.SaveChanges() > 0;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                contexto.Dispose();
+            }
+            return paso;
+        }
+
+        private static bool Modificar(Moras mora)
+        {
+            bool paso = false;
+            Contexto contexto = new Contexto();
+
+            try
+            {
+                contexto.Database.ExecuteSqlRaw($"Delete from MorasDetalle Where MoraId = {mora.MorasId}");
+                foreach (var item in mora.Detalle)
+                {
+                    contexto.Entry(item).State = EntityState.Added;
+                }
+
+                contexto.Entry(mora).State = EntityState.Modified;
+                paso = (contexto.SaveChanges() > 0);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                contexto.Dispose();
+            }
+            return paso;
+        }
         public static bool Guardar(Moras mora)
         {
             if (!Existe(mora.MorasId))
@@ -18,88 +84,15 @@ namespace Reg_prestamos.BLL
             else
                 return Modificar(mora);
         }
-
-        private static bool Existe(int id)
-        {
-            bool Existencia = false;
-            Contexto contexto = new Contexto();
-
-            try
-            {
-                Existencia = contexto.Moras.Any(x => x.MorasId == id);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                contexto.Dispose();
-            }
-            return Existencia;
-        }
-
-        private static bool Insertar(Moras mora)
-        {
-            bool Insertado = false;
-            Contexto contexto = new Contexto();
-
-            try
-            {
-                contexto.Moras.Add(mora);
-                Insertado = (contexto.SaveChanges() > 0);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                contexto.Dispose();
-            }
-            return Insertado;
-        }
-
-        private static bool Modificar(Moras mora)
-        {
-            bool Modificado = false;
-            Contexto contexto = new Contexto();
-
-            try
-            {
-                contexto.Database.ExecuteSqlRaw($"Delete FROM MorasDetalle Where MorasId = {mora.MorasId}");
-
-                foreach (var item in mora.Detalle)
-                {
-                    contexto.Entry(item).State = EntityState.Added;
-                }
-
-                contexto.Entry(mora).State = EntityState.Modified;
-                Modificado = (contexto.SaveChanges() > 0);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                contexto.Dispose();
-            }
-            return Modificado;
-        }
-
         public static bool Eliminar(int id)
         {
-            bool Eliminado = false;
+            bool paso = false;
             Contexto contexto = new Contexto();
-
             try
             {
-                var mora = Buscar(id);
-
+                var mora = MorasBLL.Buscar(id);
                 contexto.Entry(mora).State = EntityState.Deleted;
-                Eliminado = (contexto.SaveChanges() > 0);
-
+                paso = contexto.SaveChanges() > 0;
             }
             catch (Exception)
             {
@@ -109,9 +102,8 @@ namespace Reg_prestamos.BLL
             {
                 contexto.Dispose();
             }
-            return Eliminado;
+            return paso;
         }
-
         public static Moras Buscar(int id)
         {
             Moras mora = new Moras();
@@ -119,7 +111,9 @@ namespace Reg_prestamos.BLL
 
             try
             {
-                mora = contexto.Moras.Where(e => e.MorasId == id).Include(e => e.Detalle).FirstOrDefault();
+                mora = contexto.Moras.Include(x => x.Detalle)
+                    .Where(x => x.MorasId == id)
+                    .SingleOrDefault();
             }
             catch (Exception)
             {
@@ -132,14 +126,14 @@ namespace Reg_prestamos.BLL
             return mora;
         }
 
-        public static List<Moras> GetList(Expression<Func<Moras, bool>> mora)
+        public static List<Moras> GetList(Expression<Func<Moras, bool>> criterio)
         {
             List<Moras> Lista = new List<Moras>();
             Contexto contexto = new Contexto();
 
             try
             {
-                Lista = contexto.Moras.Where(mora).ToList();
+                Lista = contexto.Moras.Where(criterio).ToList();
             }
             catch (Exception)
             {
@@ -151,5 +145,6 @@ namespace Reg_prestamos.BLL
             }
             return Lista;
         }
+
     }
 }

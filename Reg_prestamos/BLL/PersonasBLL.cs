@@ -11,15 +11,20 @@ namespace Reg_prestamos.BLL
 {
     public class PersonasBLL
     {
-        public static bool Modificar(Persona personas)
+        public static bool Guardar(Persona persona)
         {
-            bool paso = false;
-            Contexto db = new Contexto();
-
+            if (!Existe(persona.PersonaID))
+                return Insertar(persona);
+            else
+                return Modificar(persona);
+        }
+        public static bool Existe(int id)
+        {
+            Contexto contexto = new Contexto();
+            bool encontrado = false;
             try
             {
-                db.Entry(personas).State = EntityState.Modified;
-                paso = db.SaveChanges() > 0;
+                encontrado = contexto.Personas.Any(e => e.PersonaID == id);
             }
             catch (Exception)
             {
@@ -27,75 +32,63 @@ namespace Reg_prestamos.BLL
             }
             finally
             {
-                db.Dispose();
+                contexto.Dispose();
             }
-
-            return paso;
-        }
-
-        public static bool insertar(Persona personas)
-        {
-            bool paso = false;
-            Contexto db = new Contexto();
-             
-            try
-            {
-                db.Personas.Add(personas);
-                paso = db.SaveChanges() > 0;
-            }
-            catch
-            {
-                throw;
-            }
-            finally
-            {
-                db.Dispose();
-            }
-
-            return paso;
-        }
-
-
-        public static bool Existe(int id)
-        {
-            Contexto db = new Contexto();
-            bool encontrado = false;
-            try
-            {
-                encontrado = db.Personas.Any(p => p.PersonaID == id);
-            }
-            catch
-            {
-                throw;
-            }
-            finally
-            {
-                db.Dispose();
-            }
-
             return encontrado;
         }
 
-
-        public static bool Guardar(Persona personas)
+        private static bool Insertar(Persona persona)
         {
-            if (!Existe(personas.PersonaID))
-                return insertar(personas);
-            else
-                return Modificar(personas);
+            bool paso = false;
+            Contexto contexto = new Contexto();
+            try
+            {
+                contexto.Personas.Add(persona);
+                paso = contexto.SaveChanges() > 0;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                contexto.Dispose();
+            }
+            return paso;
         }
+
+        public static bool Modificar(Persona persona)
+        {
+            bool paso = false;
+            Contexto contexto = new Contexto();
+            try
+            {
+                contexto.Entry(persona).State = EntityState.Modified;
+                paso = contexto.SaveChanges() > 0;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                contexto.Dispose();
+            }
+            return paso;
+        }
+
         public static bool Eliminar(int id)
         {
             bool paso = false;
-            Contexto db = new Contexto();
-
+            Contexto contexto = new Contexto();
             try
             {
-                var registro = db.Personas.Find(id);
-                if (registro != null)
+                var persona = contexto.Personas.Find(id);
+
+                if (persona != null)
                 {
-                    db.Personas.Remove(registro);
-                    paso = db.SaveChanges() > 0;
+                    contexto.Personas.Remove(persona);
+                    paso = contexto.SaveChanges() > 0;
                 }
             }
             catch (Exception)
@@ -104,19 +97,22 @@ namespace Reg_prestamos.BLL
             }
             finally
             {
-                db.Dispose();
+                contexto.Dispose();
             }
+
             return paso;
         }
 
         public static Persona Buscar(int id)
         {
-            Contexto db = new Contexto();
-            Persona personas;
+            Contexto contexto = new Contexto();
+            Persona persona;
 
             try
             {
-                personas = db.Personas.Find(id);
+                persona = contexto.Personas
+                    .Where(e => e.PersonaID == id)
+                    .FirstOrDefault();
             }
             catch (Exception)
             {
@@ -124,10 +120,10 @@ namespace Reg_prestamos.BLL
             }
             finally
             {
-                db.Dispose();
+                contexto.Dispose();
             }
 
-            return personas;
+            return persona;
         }
         public static bool AumentarBalance(int personaId, decimal balancePrestamo)
         {
@@ -152,7 +148,6 @@ namespace Reg_prestamos.BLL
             }
             return paso;
         }
-
         public static bool DisminuirBalance(int personaId, decimal balancePrestamo)
         {
             bool paso = false;
@@ -176,15 +171,13 @@ namespace Reg_prestamos.BLL
             }
             return paso;
         }
-
-
-        public static List<Persona> GetPersonas()
+        public static List<Persona> GetList(Expression<Func<Persona, bool>> persona)
         {
-            List<Persona> lista = new List<Persona>();
-            Contexto db = new Contexto();
+            List<Persona> Lista = new List<Persona>();
+            Contexto contexto = new Contexto();
             try
             {
-                lista = db.Personas.ToList();
+                Lista = contexto.Personas.Where(persona).ToList();
             }
             catch (Exception)
             {
@@ -192,28 +185,9 @@ namespace Reg_prestamos.BLL
             }
             finally
             {
-                db.Dispose();
+                contexto.Dispose();
             }
-            return lista;
-        }
-
-        public static List<Persona> GetList(Expression<Func<Persona, bool>> criterio)
-        {
-            List<Persona> lista = new List<Persona>();
-            Contexto db = new Contexto();
-            try
-            {
-                lista = db.Personas.Where(criterio).ToList();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            finally
-            {
-                db.Dispose();
-            }
-            return lista;
+            return Lista;
         }
     }
 }

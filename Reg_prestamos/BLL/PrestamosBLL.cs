@@ -5,28 +5,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
+
 
 namespace Reg_prestamos.BLL
 {
     public class PrestamosBLL
     {
-        public static bool Guardar(Prestamos prestamos, decimal montoAnterior)
+        public static bool Guardar(Prestamos prestamo, decimal montoAnterior)
         {
-            if (!Existe(prestamos.PersonasID))
-                return Insertar(prestamos);
+            if (!Existe(prestamo.PrestamoID))
+                return Insertar(prestamo);
             else
-                return Modificar(prestamos, montoAnterior);
+                return Editar(prestamo, montoAnterior);
         }
-        private static bool Insertar(Prestamos prestamos)
+        private static bool Insertar(Prestamos prestamo)
         {
             bool paso = false;
             Contexto contexto = new Contexto();
-
             try
             {
-                PersonasBLL.AumentarBalance(prestamos.PersonasID, prestamos.Monto);
-                contexto.Prestamos.Add(prestamos);
+                PersonasBLL.AumentarBalance(prestamo.PersonasID, prestamo.Monto);
+                contexto.Prestamos.Add(prestamo);
                 paso = contexto.SaveChanges() > 0;
             }
             catch (Exception)
@@ -37,20 +36,20 @@ namespace Reg_prestamos.BLL
             {
                 contexto.Dispose();
             }
-
             return paso;
         }
-        private static bool Modificar(Prestamos prestamos, decimal montoAnterior)
-        {
-            Contexto contexto = new Contexto();
-            bool paso = false;
 
+        public static bool Editar(Prestamos prestamo, decimal montoAnterior)
+        {
+            bool paso = false;
+            Contexto contexto = new Contexto();
             try
             {
-                PersonasBLL.DisminuirBalance(prestamos.PersonasID, montoAnterior);
-                PersonasBLL.AumentarBalance(prestamos.PersonasID, prestamos.Monto);
-                contexto.Entry(prestamos).State = EntityState.Modified;
+                PersonasBLL.DisminuirBalance(prestamo.PersonasID, montoAnterior);
+                PersonasBLL.AumentarBalance(prestamo.PersonasID, prestamo.Monto);
+                contexto.Entry(prestamo).State = EntityState.Modified;
                 paso = contexto.SaveChanges() > 0;
+
             }
             catch (Exception)
             {
@@ -60,14 +59,12 @@ namespace Reg_prestamos.BLL
             {
                 contexto.Dispose();
             }
-
             return paso;
         }
         public static bool Eliminar(int id)
         {
             bool paso = false;
             Contexto contexto = new Contexto();
-
             try
             {
                 var prestamo = contexto.Prestamos.Find(id);
@@ -88,14 +85,14 @@ namespace Reg_prestamos.BLL
             }
             return paso;
         }
+
         public static Prestamos Buscar(int id)
         {
             Contexto contexto = new Contexto();
-            Prestamos prestamos;
-
+            Prestamos prestamo;
             try
             {
-                prestamos = contexto.Prestamos.Find(id);
+                prestamo = contexto.Prestamos.Find(id);
             }
             catch (Exception)
             {
@@ -106,14 +103,12 @@ namespace Reg_prestamos.BLL
                 contexto.Dispose();
             }
 
-            return prestamos;
+            return prestamo;
         }
-
         public static bool Existe(int id)
         {
             Contexto contexto = new Contexto();
             bool encontrado = false;
-
             try
             {
                 encontrado = contexto.Prestamos
@@ -127,17 +122,15 @@ namespace Reg_prestamos.BLL
             {
                 contexto.Dispose();
             }
-
             return encontrado;
         }
-        
-        public static List<Prestamos> GetPersonas()
+        public static List<Prestamos> GetList(Expression<Func<Prestamos, bool>> criterio)
         {
             List<Prestamos> lista = new List<Prestamos>();
             Contexto contexto = new Contexto();
             try
             {
-                lista = contexto.Prestamos.ToList();
+                lista = contexto.Prestamos.Where(criterio).ToList();
             }
             catch (Exception)
             {
@@ -149,14 +142,12 @@ namespace Reg_prestamos.BLL
             }
             return lista;
         }
-
-        public static List<Prestamos> GetList(Expression<Func<Prestamos, bool>> criterio)
+        public static List<Prestamos> GetList()
         {
             List<Prestamos> lista = new List<Prestamos>();
             Contexto contexto = new Contexto();
             try
             {
-                //obtener la lista y filtrarla según el criterio recibido por parametro.
                 lista = contexto.Prestamos.ToList();
             }
             catch (Exception)

@@ -22,7 +22,6 @@ namespace Reg_prestamos.Model
             MorasId = 0;
             Fecha = DateTime.Now;
             Total = 0;
-            Detalle = new List<MorasDetalle>();
         }
 
     }

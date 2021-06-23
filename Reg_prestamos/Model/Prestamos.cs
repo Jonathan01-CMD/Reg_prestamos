@@ -35,5 +35,6 @@ namespace Reg_prestamos.Model
             Monto = 0;
             Balance = 0;
         }
+
     }
 }
